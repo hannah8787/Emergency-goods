@@ -103,6 +103,9 @@ select.setting-select{width:100%;border:1.5px solid #D5D8DC;border-radius:4px;pa
 .section.collapsed .section-toggle{transform:rotate(-90deg);}
 .section.collapsed .section-body{display:none;}
 
+.section-header-static{display:flex;align-items:center;gap:10px;padding:10px 16px;border-bottom:1px solid #D5D8DC;background:#FAFAFA;white-space:nowrap;overflow:hidden;}
+.subcategory-header{padding:6px 16px;font-size:10px;font-weight:700;color:#717D7E;background:#F2F3F4;border-bottom:1px solid #D5D8DC;letter-spacing:.08em;text-transform:uppercase;}
+
 /* TABLE */
 .item-table{width:100%;border-collapse:collapse;}
 .item-table th{background:#F2F3F4;padding:6px 10px;font-size:10px;font-weight:700;color:#717D7E;text-align:left;letter-spacing:.06em;text-transform:uppercase;border-bottom:1px solid #D5D8DC;white-space:nowrap;}
@@ -258,9 +261,9 @@ body{background:white;font-size:11px;}
 <div id="main">
   <div id="tabs">
     <button class="tab active" data-view="home" onclick="switchTab(this)">🏠 備蓄品</button>
-    <button class="tab" data-view="preaction" onclick="switchTab(this)">✅ 事前対処</button>
     <button class="tab" data-view="outing" onclick="switchTab(this)">👜 外出携行品</button>
     <button class="tab" data-view="car" id="tab-car" onclick="switchTab(this)">🚗 車載品</button>
+    <button class="tab" data-view="preaction" onclick="switchTab(this)">✅ 事前対処</button>
   </div>
 
   <!-- ── 備蓄品リスト ── -->
@@ -315,13 +318,12 @@ body{background:white;font-size:11px;}
         <div class="vslbl">項目数</div>
       </div>
     </div>
-    <div class="section">
-      <div class="section-header" onclick="toggleSection('preaction-main')">
+    <div class="outing-section">
+      <div class="section-header-static">
         <span class="section-icon">✅</span>
         <span class="section-title">災害前にやっておくこと</span>
-        <span class="section-toggle">▼</span>
       </div>
-      <div class="section-body" id="preaction-list"></div>
+      <div id="preaction-list"></div>
     </div>
   </div>
 
@@ -345,22 +347,12 @@ body{background:white;font-size:11px;}
       </div>
     </div>
     <div class="outing-section">
-      <div class="section-header" onclick="toggleSection('outing-main')">
+      <div class="section-header-static">
         <span class="section-icon">👜</span>
-        <span class="section-title">外出時 携帯リスト</span>
-        <span class="section-stats" style="font-size:10px;color:#717D7E;">目安：合計500g以内　バッグに常時入れておく帰宅難民対策セット</span>
-        <span class="section-toggle">▼</span>
+        <span class="section-title">外出時 携帯品</span>
+        <span style="font-size:10px;color:#717D7E;margin-left:8px;">合計500g以内目安</span>
       </div>
-      <div class="section-body">
-        <table class="outing-table" id="outing-table">
-          <thead><tr>
-            <th style="width:34px">✓</th>
-            <th>品目・用途</th>
-            <th style="width:80px">目安重量</th>
-          </tr></thead>
-          <tbody id="outing-tbody"></tbody>
-        </table>
-      </div>
+      <div id="outing-tbody-wrap"></div>
     </div>
   </div>
 
@@ -384,31 +376,12 @@ body{background:white;font-size:11px;}
       </div>
     </div>
     <div class="outing-section">
-      <div class="section-header" onclick="toggleSection('car-main')">
+      <div class="section-header-static">
         <span class="section-icon">🚗</span>
-        <span class="section-title">車載 常備リスト</span>
-        <span class="section-stats" style="font-size:10px;color:#717D7E;">運転中・駐車中の被災を想定。トランクまたは車内に常時積んでおく</span>
-        <span class="section-toggle">▼</span>
+        <span class="section-title">車載 常備品</span>
+        <span style="font-size:10px;color:#717D7E;margin-left:8px;">トランクまたは車内に常時積んでおく</span>
       </div>
-      <div class="section-body">
-        <table class="outing-table" id="car-table">
-          <thead><tr>
-            <th style="width:34px">✓</th>
-            <th>品目・用途</th>
-          </tr></thead>
-          <tbody id="car-tbody"></tbody>
-        </table>
-      </div>
-    </div>
-    <div class="tips-box">
-      <h3>💡 車載備蓄のポイント</h3>
-      <ul>
-        <li>ガソリンは残量が半分になったら給油を習慣化。災害直後は給油渋滞が発生</li>
-        <li>夏場の車内は高温になるため、食料・薬は熱に強いものを選ぶ</li>
-        <li>水害時は車ごと流されるリスクがある。低地・アンダーパスは通らない</li>
-        <li>車中泊の際は一酸化炭素中毒に注意。定期的に換気を</li>
-        <li>緊急脱出ハンマーは運転席から手が届く位置に固定</li>
-      </ul>
+      <div id="car-tbody-wrap"></div>
     </div>
   </div>
 
@@ -629,69 +602,69 @@ const CATEGORIES = [
 
 // 事前対処リスト
 const PREACTIONS = [
-  {name:"ガラス飛散防止フィルムを全窓に施工", sub:"地震後の室内ガラス飛散による怪我を大幅に減らせる最も費用対効果の高い対策の一つ。賃貸は管理会社に要確認", target:"全員"},
-  {name:"家具・家電の転倒防止固定（L字金具・突っ張り棒）", sub:"地震による家具の倒壊は怪我・脱出阻害・火災の原因になる。特に寝室・玄関周りを優先して固定", target:"全員"},
-  {name:"冷蔵庫・食器棚への扉ロック設置", sub:"強い揺れで扉が開いて中身が飛び出す。100均の扉ロックでも効果あり", target:"全員"},
-  {name:"自宅のハザードマップを確認（浸水・土砂・津波）", sub:"国土交通省「重ねるハザードマップ」で自宅の各リスクを確認。リスクの種類によって避難行動が変わる", target:"全員"},
-  {name:"避難場所・避難所の場所を確認し家族全員で共有", sub:"自治体の避難場所・広域避難場所・緊急避難場所の違いを把握。複数パターンを確認しておく", target:"全員"},
-  {name:"家族の集合場所・連絡方法を事前に決めておく", sub:"「誰が・どこへ・どのルートで」を具体的に決めて全員が暗記。171災害伝言ダイヤルの使い方も練習", target:"全員"},
-  {name:"在宅避難か避難所避難かの判断基準を決める", sub:"建物の被害状況・ライフライン状況・家族構成によって判断。高層マンションは「在宅避難」が原則のケースも多い", target:"全員"},
-  {name:"徒歩帰宅ルートを2〜3パターン確認し紙地図を作成", sub:"公共交通停止時に職場・学校から自宅まで徒歩で帰る想定。低地・アンダーパス・崖下を避けるルートを選定", target:"全員"},
-  {name:"ガソリンは残量半分になったら給油を習慣化", sub:"災害直後は給油渋滞・品切れが発生。普段から8分の1以下にしない習慣が命を守る", target:"車あり"},
-  {name:"車の避難路確認（水害時に低地・地下を通らないルート）", sub:"水害時にアンダーパス・低地ルートを通ると車ごと水没するリスクがある。高台ルートを事前に確認", target:"車あり"},
-  {name:"耐震診断・耐震補強の確認", sub:"1981年以前建築（旧耐震基準）の建物は特に要確認。無料耐震診断を実施している自治体が多い", target:"戸建て"},
-  {name:"屋根・外壁の定期点検（年1回）", sub:"地震後の雨漏り対策。ブルーシートでの応急修理方法も事前に確認しておく", target:"戸建て"},
-  {name:"停電時のオートロック解除・出入り方法を確認", sub:"マンションのオートロックは停電時に開いたまま or 閉まったまま、どちらかを事前に管理組合に確認", target:"マンション"},
-  {name:"管理組合・自治会の防災計画を把握する", sub:"集合住宅は個人対策に限界がある。共助体制・備蓄場所・役割分担を把握", target:"マンション"},
-  {name:"近隣住民と顔見知りになっておく", sub:"災害時の助け合いは平時の人間関係から生まれる。特に高齢者・一人暮らしの隣人を把握しておく", target:"全員"},
-  {name:"かかりつけ医・処方薬の情報をまとめておく", sub:"お薬手帳のコピー・主治医の連絡先・薬の名称・用量を紙にまとめて避難リュックに", target:"高齢者同居・持病あり"},
-  {name:"重要書類のスキャン・クラウド保存", sub:"通帳・保険証・権利証・マイナンバー・お薬手帳をスキャン。Googleドライブ等に保存", target:"全員"},
-  {name:"171災害伝言ダイヤルの使い方を家族全員で練習", sub:"毎年1/17・3/11・9/1等に体験利用できる。いざという時に使えるよう練習を", target:"全員"},
-  {name:"SNS・緊急連絡先リストを紙に印刷しておく", sub:"スマホが使えない・壊れた時でも家族・知人・行政機関に連絡できるよう紙のリストを作成", target:"全員"},
-  {name:"現金の小銭を十分に確保しておく", sub:"停電時は電子決済・ATMが使えない。自動販売機・公衆電話のために小銭（100円・10円）を意識的にストック", target:"全員"},
+  {cat:"🏠 住まいの安全対策", name:"ガラス飛散防止フィルムを全窓に施工", sub:"地震後の室内ガラス飛散による怪我を大幅に減らせる最も費用対効果の高い対策の一つ。賃貸は管理会社に要確認", target:"全員"},
+  {cat:"🏠 住まいの安全対策", name:"家具・家電の転倒防止固定（L字金具・突っ張り棒）", sub:"地震による家具の倒壊は怪我・脱出阻害・火災の原因になる。特に寝室・玄関周りを優先して固定", target:"全員"},
+  {cat:"🏠 住まいの安全対策", name:"冷蔵庫・食器棚への扉ロック設置", sub:"強い揺れで扉が開いて中身が飛び出す。100均の扉ロックでも効果あり", target:"全員"},
+  {cat:"🏠 住まいの安全対策", name:"耐震診断・耐震補強の確認", sub:"1981年以前建築（旧耐震基準）の建物は特に要確認。無料耐震診断を実施している自治体が多い", target:"戸建て"},
+  {cat:"🏠 住まいの安全対策", name:"屋根・外壁の定期点検（年1回）", sub:"地震後の雨漏り対策。ブルーシートでの応急修理方法も事前に確認しておく", target:"戸建て"},
+  {cat:"🏠 住まいの安全対策", name:"停電時のオートロック解除・出入り方法を確認", sub:"マンションのオートロックは停電時に開いたまま or 閉まったまま、どちらかを事前に管理組合に確認", target:"マンション"},
+  {cat:"🏠 住まいの安全対策", name:"管理組合・自治会の防災計画を把握する", sub:"集合住宅は個人対策に限界がある。共助体制・備蓄場所・役割分担を把握", target:"マンション"},
+  {cat:"🗺️ 避難計画", name:"自宅のハザードマップを確認（浸水・土砂・津波）", sub:"国土交通省「重ねるハザードマップ」で自宅の各リスクを確認。リスクの種類によって避難行動が変わる", target:"全員"},
+  {cat:"🗺️ 避難計画", name:"避難場所・避難所の場所を確認し家族全員で共有", sub:"自治体の避難場所・広域避難場所・緊急避難場所の違いを把握。複数パターンを確認しておく", target:"全員"},
+  {cat:"🗺️ 避難計画", name:"家族の集合場所・連絡方法を事前に決めておく", sub:"「誰が・どこへ・どのルートで」を具体的に決めて全員が暗記。171災害伝言ダイヤルの使い方も練習", target:"全員"},
+  {cat:"🗺️ 避難計画", name:"在宅避難か避難所避難かの判断基準を決める", sub:"建物の被害状況・ライフライン状況・家族構成によって判断。高層マンションは「在宅避難」が原則のケースも多い", target:"全員"},
+  {cat:"🗺️ 避難計画", name:"徒歩帰宅ルートを2〜3パターン確認し紙地図を作成", sub:"公共交通停止時に職場・学校から自宅まで徒歩で帰る想定。低地・アンダーパス・崖下を避けるルートを選定", target:"全員"},
+  {cat:"🗺️ 避難計画", name:"ガソリンは残量半分になったら給油を習慣化", sub:"災害直後は給油渋滞・品切れが発生。普段から8分の1以下にしない習慣が命を守る", target:"車あり"},
+  {cat:"🗺️ 避難計画", name:"車の避難路確認（水害時に低地・地下を通らないルート）", sub:"水害時にアンダーパス・低地ルートを通ると車ごと水没するリスクがある。高台ルートを事前に確認", target:"車あり"},
+  {cat:"📋 情報・連絡体制", name:"重要書類のスキャン・クラウド保存", sub:"通帳・保険証・権利証・マイナンバー・お薬手帳をスキャン。Googleドライブ等に保存", target:"全員"},
+  {cat:"📋 情報・連絡体制", name:"SNS・緊急連絡先リストを紙に印刷しておく", sub:"スマホが使えない・壊れた時でも家族・知人・行政機関に連絡できるよう紙のリストを作成", target:"全員"},
+  {cat:"📋 情報・連絡体制", name:"171災害伝言ダイヤルの使い方を家族全員で練習", sub:"毎年1/17・3/11・9/1等に体験利用できる。いざという時に使えるよう練習を", target:"全員"},
+  {cat:"📋 情報・連絡体制", name:"現金の小銭を十分に確保しておく", sub:"停電時は電子決済・ATMが使えない。自動販売機・公衆電話のために小銭（100円・10円）を意識的にストック", target:"全員"},
+  {cat:"🤝 地域・医療", name:"近隣住民と顔見知りになっておく", sub:"災害時の助け合いは平時の人間関係から生まれる。特に高齢者・一人暮らしの隣人を把握しておく", target:"全員"},
+  {cat:"🤝 地域・医療", name:"かかりつけ医・処方薬の情報をまとめておく", sub:"お薬手帳のコピー・主治医の連絡先・薬の名称・用量を紙にまとめて避難リュックに", target:"高齢者同居・持病あり"},
 ];
 
 // 外出時リスト
 const OUTING_ITEMS = [
-  {name:"現金（小銭含む）", detail:"1,000円札×5枚＋100円玉×10枚。自販機・公衆電話を想定", weight:"〜50g"},
-  {name:"モバイルバッテリー＋充電ケーブル", detail:"10,000mAh以上推奨", weight:"〜200g"},
-  {name:"携帯食（カロリーメイト等）", detail:"2本入り×2箱", weight:"〜100g"},
-  {name:"折りたたみウォーターボトル", detail:"給水所・水道で補充", weight:"〜30g"},
-  {name:"N95マスク（個包装）", detail:"2〜3枚", weight:"〜20g"},
-  {name:"使い捨て手袋（ニトリル）", detail:"3双", weight:"〜10g"},
-  {name:"絆創膏・小型救急セット", detail:"10枚以上", weight:"〜30g"},
-  {name:"常備薬（処方薬含む）", detail:"3〜5日分", weight:"〜30g"},
-  {name:"ホイッスル（笛）", detail:"バッグの外に付けておく", weight:"〜10g"},
-  {name:"アルミブランケット", detail:"折りたたみコンパクト型", weight:"〜50g"},
-  {name:"ヘッドライト or キーホルダーライト", detail:"夜間移動・停電時", weight:"〜30g"},
-  {name:"軽量レインポンチョ", detail:"傘より両手が使える", weight:"〜60g"},
-  {name:"紙の地図（職場〜自宅ルート）", detail:"A4印刷・ラミネート", weight:"〜10g"},
-  {name:"緊急連絡先メモ（カード）", detail:"財布にも1枚", weight:"〜5g"},
-  {name:"ティッシュ・ウェットティッシュ", detail:"各1パック", weight:"〜40g"},
-  {name:"生理用品（スリム型）", detail:"3〜5枚", weight:"〜30g"},
-  {name:"簡易トイレ袋（2枚）", detail:"個包装コンパクト型", weight:"〜20g"},
+  {cat:"💰 お金・通信", name:"現金（小銭含む）", detail:"1,000円札×5枚＋100円玉×10枚。自販機・公衆電話を想定", weight:"〜50g"},
+  {cat:"💰 お金・通信", name:"モバイルバッテリー＋充電ケーブル", detail:"10,000mAh以上推奨", weight:"〜200g"},
+  {cat:"💰 お金・通信", name:"緊急連絡先メモ（カード）", detail:"財布にも1枚", weight:"〜5g"},
+  {cat:"💰 お金・通信", name:"紙の地図（職場〜自宅ルート）", detail:"A4印刷・ラミネート", weight:"〜10g"},
+  {cat:"🍫 食料・水", name:"携帯食（カロリーメイト等）", detail:"2本入り×2箱", weight:"〜100g"},
+  {cat:"🍫 食料・水", name:"折りたたみウォーターボトル", detail:"給水所・水道で補充", weight:"〜30g"},
+  {cat:"🩺 衛生・救急", name:"N95マスク（個包装）", detail:"2〜3枚", weight:"〜20g"},
+  {cat:"🩺 衛生・救急", name:"使い捨て手袋（ニトリル）", detail:"3双", weight:"〜10g"},
+  {cat:"🩺 衛生・救急", name:"絆創膏・小型救急セット", detail:"10枚以上", weight:"〜30g"},
+  {cat:"🩺 衛生・救急", name:"常備薬（処方薬含む）", detail:"3〜5日分", weight:"〜30g"},
+  {cat:"🩺 衛生・救急", name:"ティッシュ・ウェットティッシュ", detail:"各1パック", weight:"〜40g"},
+  {cat:"🩺 衛生・救急", name:"生理用品（スリム型）", detail:"3〜5枚", weight:"〜30g"},
+  {cat:"🩺 衛生・救急", name:"簡易トイレ袋（2枚）", detail:"個包装コンパクト型", weight:"〜20g"},
+  {cat:"🛡️ 安全・防災", name:"ホイッスル（笛）", detail:"バッグの外に付けておく", weight:"〜10g"},
+  {cat:"🛡️ 安全・防災", name:"アルミブランケット", detail:"折りたたみコンパクト型", weight:"〜50g"},
+  {cat:"🛡️ 安全・防災", name:"ヘッドライト or キーホルダーライト", detail:"夜間移動・停電時", weight:"〜30g"},
+  {cat:"🛡️ 安全・防災", name:"軽量レインポンチョ", detail:"傘より両手が使える", weight:"〜60g"},
 ];
 
 // 車載リスト
 const CAR_ITEMS = [
-  {name:"車用緊急脱出ハンマー", detail:"運転席から手が届く位置に固定。窓破壊＋シートベルト切断"},
-  {name:"飲料水（500ml×4本）", detail:"夏場は熱に注意・定期交換"},
-  {name:"非常食（カロリーメイト等）", detail:"熱に強いものを選ぶ"},
-  {name:"毛布・アルミブランケット", detail:"車中泊・防寒に"},
-  {name:"救急セット（絆創膏・消毒）", detail:"小型でOK"},
-  {name:"懐中電灯・ヘッドライト", detail:"乾電池式推奨"},
-  {name:"軍手・安全手袋", detail:"事故・瓦礫対処に"},
-  {name:"レインポンチョ", detail:"車外での作業・移動に"},
-  {name:"長靴（折りたたみ）", detail:"浸水道路・瓦礫道に"},
-  {name:"ホイッスル", detail:"車内閉じ込め時の救助要請"},
-  {name:"モバイルバッテリー＋ケーブル", detail:"車のシガーソケットでも充電"},
-  {name:"現金（小銭含む）", detail:"1〜2万円程度"},
-  {name:"紙の地図（広域）", detail:"通信障害時のナビ代替"},
-  {name:"ガムテープ・養生テープ", detail:"応急修理・窓の補修に"},
-  {name:"タイヤ修理キット or スペアタイヤ", detail:"積んであるか確認"},
-  {name:"ジャンプスターター（バッテリー充電器）", detail:"バッテリー上がり時の自己救助"},
-  {name:"消火器（車載用）", detail:"車両火災時の初期消火"},
-  {name:"簡易トイレ袋", detail:"渋滞・道路閉鎖時に"},
+  {cat:"🚨 緊急脱出", name:"車用緊急脱出ハンマー", detail:"運転席から手が届く位置に固定。水没・衝突時の窓破壊＋シートベルト切断用"},
+  {cat:"🚨 緊急脱出", name:"消火器（車載用）", detail:"車両火災時の初期消火。シート下など取り出しやすい場所に固定"},
+  {cat:"🍫 食料・水", name:"飲料水（500ml×4本）", detail:"夏場は車内高温になるため定期交換を。熱に強いペットボトルを選ぶ"},
+  {cat:"🍫 食料・水", name:"非常食（カロリーメイト等）", detail:"高温でも劣化しにくいものを。渋滞・道路閉鎖時の長時間待機を想定"},
+  {cat:"🍫 食料・水", name:"簡易トイレ袋", detail:"渋滞・道路閉鎖時の車内使用を想定"},
+  {cat:"🩺 衛生・救急", name:"救急セット（絆創膏・消毒）", detail:"小型でOK。事故・避難時の外傷処置に"},
+  {cat:"🛡️ 安全・防護", name:"軍手・安全手袋", detail:"事故・瓦礫の撤去作業に"},
+  {cat:"🛡️ 安全・防護", name:"レインポンチョ", detail:"車外での作業・移動に。傘より両手が使える"},
+  {cat:"🛡️ 安全・防護", name:"長靴（折りたたみ）", detail:"浸水道路・瓦礫道の歩行に。水害時は低地・アンダーパスに近づかない"},
+  {cat:"🛡️ 安全・防護", name:"ホイッスル", detail:"車内閉じ込め時の救助要請。声より遠くまで届く"},
+  {cat:"🌙 車中泊・防寒", name:"毛布・アルミブランケット", detail:"車中泊・防寒に。一酸化炭素中毒防止のため定期的に換気すること"},
+  {cat:"🌙 車中泊・防寒", name:"懐中電灯・ヘッドライト", detail:"乾電池式推奨。夜間作業・車内照明に"},
+  {cat:"💰 お金・通信", name:"モバイルバッテリー＋ケーブル", detail:"シガーソケットでも充電可能。通信確保のために"},
+  {cat:"💰 お金・通信", name:"現金（小銭含む）", detail:"1〜2万円程度。停電時はカード・電子マネー不可"},
+  {cat:"💰 お金・通信", name:"紙の地図（広域）", detail:"通信障害時のナビ代替。スマホオフライン地図との併用推奨"},
+  {cat:"🔧 工具・修理", name:"ガムテープ・養生テープ", detail:"応急修理・窓の補修・荷物固定に"},
+  {cat:"🔧 工具・修理", name:"タイヤ修理キット or スペアタイヤ", detail:"積んであるか定期確認を。パンク時の自己救助に"},
+  {cat:"🔧 工具・修理", name:"ジャンプスターター（バッテリー充電器）", detail:"バッテリー上がり時の自己救助。スマホ充電にも使える"},
 ];
 
 // ═══════════════════════════════════════════════════
@@ -822,87 +795,75 @@ function renderSections() {
 }
 
 // ═══════════════════════════════════════════════════
-// RENDER: 事前対処
+// RENDER: 事前対処・外出・車載（カテゴリ小見出し共通）
 // ═══════════════════════════════════════════════════
+function renderWithCategories(items, wrapId, prefix, checkedMap, toggleFn, extraCol) {
+  const wrap = document.getElementById(wrapId);
+  if (!wrap) return;
+  let done = 0, html = '', lastCat = null;
+  items.forEach((item, i) => {
+    const id = prefix + '_' + i;
+    const chk = !!checkedMap[id];
+    if (chk) done++;
+    if (item.cat && item.cat !== lastCat) {
+      html += `<div class="subcategory-header">${item.cat}</div>`;
+      lastCat = item.cat;
+    }
+    if (extraCol === 'weight') {
+      html += `<div class="preaction-item ${chk ? 'preaction-done' : ''}">
+        <input type="checkbox" class="preaction-check" ${chk ? 'checked' : ''} onchange="${toggleFn}('${id}',this.checked)">
+        <div class="preaction-body" style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px;">
+          <div style="flex:1;">
+            <div class="preaction-name ${chk ? 'checked-label' : ''}">${item.name}</div>
+            <div class="preaction-sub">${item.detail || ''}</div>
+          </div>
+          <div style="font-size:10px;color:#717D7E;font-family:'DM Mono',monospace;white-space:nowrap;flex-shrink:0;">${item.weight || ''}</div>
+        </div>
+      </div>`;
+    } else if (extraCol === 'target') {
+      html += `<div class="preaction-item ${chk ? 'preaction-done' : ''}">
+        <input type="checkbox" class="preaction-check" ${chk ? 'checked' : ''} onchange="${toggleFn}('${id}',this.checked)">
+        <div class="preaction-body">
+          <div class="preaction-name ${chk ? 'checked-label' : ''}">${item.name}</div>
+          <div class="preaction-sub">${item.sub || ''}</div>
+          <div class="preaction-target">📌 対象：${item.target}</div>
+        </div>
+      </div>`;
+    } else {
+      html += `<div class="preaction-item ${chk ? 'preaction-done' : ''}">
+        <input type="checkbox" class="preaction-check" ${chk ? 'checked' : ''} onchange="${toggleFn}('${id}',this.checked)">
+        <div class="preaction-body">
+          <div class="preaction-name ${chk ? 'checked-label' : ''}">${item.name}</div>
+          <div class="preaction-sub">${item.detail || ''}</div>
+        </div>
+      </div>`;
+    }
+  });
+  wrap.innerHTML = html;
+  return done;
+}
+
 function renderPreaction() {
-  const list = document.getElementById('preaction-list');
-  let done=0, total=PREACTIONS.length;
-  let html='';
-  PREACTIONS.forEach((item,i) => {
-    const id='pre_'+i;
-    const chk=!!preChecked[id];
-    if(chk) done++;
-    const show = activePreFilter==='all' || (activePreFilter==='done'&&chk) || (activePreFilter==='remain'&&!chk);
-    if(!show) return;
-    html+=`<div class="preaction-item ${chk?'preaction-done':''}">
-      <input type="checkbox" class="preaction-check" ${chk?'checked':''} onchange="togglePre('${id}',this.checked)">
-      <div class="preaction-body">
-        <div class="preaction-name ${chk?'checked-label':''}">${item.name}</div>
-        <div class="preaction-sub">${item.sub}</div>
-        <div class="preaction-target">📌 対象：${item.target}</div>
-      </div>
-    </div>`;
-  });
-  list.innerHTML = html || '<div style="padding:16px;color:#717D7E;font-size:12px;">該当する項目がありません</div>';
+  const done = renderWithCategories(PREACTIONS, 'preaction-list', 'pre', preChecked, 'togglePre', 'target');
+  const total = PREACTIONS.length;
   const remain = total - done;
-  document.getElementById('pre-stat-done').textContent  = done;
-  document.getElementById('pre-stat-remain').textContent= remain;
-  document.getElementById('pre-stat-total').textContent = total;
+  document.getElementById('pre-stat-done').textContent   = done;
+  document.getElementById('pre-stat-remain').textContent = remain;
+  document.getElementById('pre-stat-total').textContent  = total;
 }
 
-// ═══════════════════════════════════════════════════
-// RENDER: 外出時リスト
-// ═══════════════════════════════════════════════════
 function renderOutingList() {
-  const tbody = document.getElementById('outing-tbody');
-  let done=0, total=OUTING_ITEMS.length;
-  let html='';
-  OUTING_ITEMS.forEach((item,i) => {
-    const id='outing_'+i;
-    const chk=!!outingChecked[id];
-    if(chk) done++;
-    const show = activeOutingFilter==='all' || (activeOutingFilter==='done'&&chk) || (activeOutingFilter==='remain'&&!chk);
-    html+=`<tr class="${chk?'outing-checked':''}" style="${show?'':'display:none'}">
-      <td class="check-cell"><input type="checkbox" class="item-check" ${chk?'checked':''} onchange="toggleOuting('${id}',this.checked)"></td>
-      <td>
-        <div class="outing-name ${chk?'checked-label':''}">${item.name}</div>
-        <div class="outing-detail">${item.detail}</div>
-      </td>
-      <td class="weight-badge">${item.weight||''}</td>
-    </tr>`;
-  });
-  tbody.innerHTML = html;
-  updateOutingStats(done, total);
-}
-
-function updateOutingStats(done, total) {
+  const done = renderWithCategories(OUTING_ITEMS, 'outing-tbody-wrap', 'outing', outingChecked, 'toggleOuting', 'weight');
+  const total = OUTING_ITEMS.length;
   const remain = total - done;
   document.getElementById('outing-stat-done').textContent   = done;
   document.getElementById('outing-stat-remain').textContent = remain;
   document.getElementById('outing-stat-total').textContent  = total;
 }
 
-// ═══════════════════════════════════════════════════
-// RENDER: 車載リスト
-// ═══════════════════════════════════════════════════
 function renderCarList() {
-  const tbody = document.getElementById('car-tbody');
-  let done=0, total=CAR_ITEMS.length;
-  let html='';
-  CAR_ITEMS.forEach((item,i) => {
-    const id='car_'+i;
-    const chk=!!carChecked[id];
-    if(chk) done++;
-    const show = activeCarFilter==='all' || (activeCarFilter==='done'&&chk) || (activeCarFilter==='remain'&&!chk);
-    html+=`<tr class="${chk?'outing-checked':''}" style="${show?'':'display:none'}">
-      <td class="check-cell"><input type="checkbox" class="item-check" ${chk?'checked':''} onchange="toggleCar('${id}',this.checked)"></td>
-      <td>
-        <div class="outing-name ${chk?'checked-label':''}">${item.name}</div>
-        <div class="outing-detail">${item.detail}</div>
-      </td>
-    </tr>`;
-  });
-  tbody.innerHTML = html;
+  const done = renderWithCategories(CAR_ITEMS, 'car-tbody-wrap', 'car', carChecked, 'toggleCar', 'none');
+  const total = CAR_ITEMS.length;
   const remain = total - done;
   document.getElementById('car-stat-done').textContent   = done;
   document.getElementById('car-stat-remain').textContent = remain;
