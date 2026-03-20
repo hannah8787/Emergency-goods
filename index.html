@@ -4,7 +4,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>家庭用 非常用品チェックリスト</title>
+<title>防災用品チェックリスト</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;500;700;900&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
@@ -17,9 +17,9 @@
 body{font-family:'Noto Sans JP',sans-serif;background:var(--gray1);color:var(--ink);font-size:13px;line-height:1.6;}
 
 /* TOP BAR */
-#topbar{background:var(–ink);color:var(–white);padding:12px 24px;display:flex;align-items:center;gap:16px;position:sticky;top:0;z-index:1000;box-shadow:0 3px 16px rgba(0,0,0,.5);-webkit-transform:translateZ(0);transform:translateZ(0);}
-#topbar h1{font-size:15px;font-weight:700;letter-spacing:.04em;flex:1;}
-.pill{background:rgba(255,255,255,.15);border-radius:20px;padding:4px 12px;font-size:11px;font-family:‘DM Mono’,monospace;}
+#topbar{background:#1A252F;color:#FFFFFF;padding:12px 24px;display:flex;align-items:center;gap:16px;position:-webkit-sticky;position:sticky;top:0;z-index:1000;box-shadow:0 3px 16px rgba(0,0,0,.5);-webkit-transform:translateZ(0);transform:translateZ(0);}
+#topbar h1{font-size:15px;font-weight:700;letter-spacing:.04em;flex:1;color:#FFFFFF;}
+.pill{background:rgba(255,255,255,.15);border-radius:20px;padding:4px 12px;font-size:11px;font-family:‘DM Mono’,monospace;color:#FFFFFF;}
 
 /* LAYOUT */
 #app{display:flex;min-height:calc(100vh - 48px);}
@@ -87,10 +87,10 @@ select.setting-select{width:100%;border:1.5px solid var(–gray2);border-radius:
 #search-input:focus{outline:none;border-color:var(–blue);}
 .filter-row{display:flex;gap:6px;margin-bottom:12px;flex-wrap:wrap;align-items:center;}
 .filter-label{font-size:11px;color:var(–gray4);}
-.filter-chip{border:1.5px solid var(–gray2);background:var(–white);border-radius:20px;padding:3px 10px;font-size:11px;cursor:pointer;font-family:‘Noto Sans JP’,sans-serif;transition:all .12s;color:var(–gray5);}
-.filter-chip:hover{border-color:var(–blue);}
-.filter-chip.active{background:var(–blue);border-color:var(–blue);color:var(–white);font-weight:600;}
-.filter-chip.active-green{background:var(–green);border-color:var(–green);color:var(–white);font-weight:600;}
+.filter-chip{border:1.5px solid var(–gray2);background:var(–white);border-radius:20px;padding:4px 12px;font-size:11px;cursor:pointer;font-family:‘Noto Sans JP’,sans-serif;transition:all .15s;color:var(–gray5);}
+.filter-chip:hover{border-color:var(–blue);background:#EBF5FB;color:var(–blue);}
+.filter-chip.active{background:var(–blue);border-color:var(–blue);color:#FFFFFF;font-weight:700;box-shadow:0 1px 4px rgba(36,113,163,.35);}
+.filter-chip.active-green{background:var(–green);border-color:var(–green);color:#FFFFFF;font-weight:700;box-shadow:0 1px 4px rgba(30,132,73,.35);}
 
 /* SECTION */
 .section{background:var(–white);border-radius:var(–radius);margin-bottom:14px;box-shadow:var(–shadow);overflow:hidden;}
@@ -125,10 +125,6 @@ input[type=checkbox].item-check{width:15px;height:15px;cursor:pointer;accent-col
 .badge-r{background:#FDECEA;color:var(–red);}
 .badge-y{background:#FEF9E7;color:#9A7D0A;}
 .badge-b{background:#EBF5FB;color:var(–blue);}
-.phase-badge{display:inline-block;border-radius:3px;padding:1px 5px;font-size:10px;font-weight:700;}
-.phase-1{background:#FDECEA;color:var(–red);}
-.phase-2{background:#FEF9E7;color:#9A7D0A;}
-.phase-3{background:#EBF5FB;color:var(–blue);}
 
 .qty-cell{width:72px;}
 .qty-input{width:64px;border:1px solid var(–gray2);border-radius:3px;padding:2px 5px;text-align:center;font-family:‘DM Mono’,monospace;font-size:11px;background:transparent;}
@@ -196,7 +192,7 @@ body{background:white;font-size:11px;}
 </head>
 <body>
 <div id="topbar">
-  <h1>🆘 家庭用 非常用品チェックリスト</h1>
+  <h1>防災用品チェックリスト</h1>
   <span class="pill" id="topbar-stat">0 / 0 入手済み</span>
 </div>
 
@@ -239,25 +235,10 @@ body{background:white;font-size:11px;}
       <button class="toggle-btn" data-key="car" onclick="toggleSetting(this)">車あり</button>
     </div>
   </div>
-  <div class="setting-row">
-    <label class="row-label">優先度フィルタ</label>
-    <select class="setting-select" id="priority-filter" onchange="applyFilters()">
-      <option value="all">すべて表示</option>
-      <option value="required">🔴 必須のみ</option>
-      <option value="required,recommend">🔴+🟡 必須・推奨のみ</option>
-    </select>
-  </div>
-
   <h2>📊 凡例</h2>
   <div class="legend-item"><span class="legend-badge badge-required">🔴 必須</span>命に直結・最優先</div>
   <div class="legend-item"><span class="legend-badge badge-recommend">🟡 推奨</span>1週間の生活維持に必要</div>
   <div class="legend-item"><span class="legend-badge badge-nice">🔵 あると安心</span>余裕があれば備えたい</div>
-  <div style="margin-top:8px;">
-    <div class="legend-item" style="font-size:10px;color:var(--gray4);margin-bottom:4px;">フェーズ</div>
-    <div class="legend-item"><span class="phase-badge phase-1">P1</span>発災〜72時間</div>
-    <div class="legend-item"><span class="phase-badge phase-2">P2</span>4〜7日目</div>
-    <div class="legend-item"><span class="phase-badge phase-3">P3</span>1週間〜1ヶ月</div>
-  </div>
   <div style="margin-top:8px;">
     <div class="legend-item"><span style="font-size:13px;">🎒</span><span style="font-size:11px;">避難リュックに入れる品目</span></div>
   </div>
@@ -276,10 +257,10 @@ body{background:white;font-size:11px;}
 
 <div id="main">
   <div id="tabs">
-    <button class="tab active" data-view="home" onclick="switchTab(this)">🏠 備蓄品リスト</button>
-    <button class="tab" data-view="preaction" onclick="switchTab(this)">✅ 事前対処リスト</button>
-    <button class="tab" data-view="outing" onclick="switchTab(this)">👜 外出時リスト</button>
-    <button class="tab" data-view="car" id="tab-car" onclick="switchTab(this)">🚗 車載リスト</button>
+    <button class="tab active" data-view="home" onclick="switchTab(this)">🏠 備蓄品</button>
+    <button class="tab" data-view="preaction" onclick="switchTab(this)">✅ 事前対処</button>
+    <button class="tab" data-view="outing" onclick="switchTab(this)">👜 外出携行品</button>
+    <button class="tab" data-view="car" id="tab-car" onclick="switchTab(this)">🚗 車載品</button>
   </div>
 
   <!-- ── 備蓄品リスト ── -->
@@ -307,14 +288,12 @@ body{background:white;font-size:11px;}
     </div>
 
 ```
-<div id="search-wrap"><input id="search-input" type="text" placeholder="🔍 品目名・説明で検索..." oninput="applyFilters()"></div>
+<div id="search-wrap"><input id="search-input" type="text" placeholder="🔍 品目名・説明で検索" oninput="applyFilters()"></div>
 <div class="filter-row">
-  <span class="filter-label">フェーズ：</span>
-  <button class="filter-chip active" data-phase="all" onclick="togglePhase(this)">すべて</button>
-  <button class="filter-chip" data-phase="1" onclick="togglePhase(this)">P1 発災〜72h</button>
-  <button class="filter-chip" data-phase="2" onclick="togglePhase(this)">P2 4〜7日</button>
-  <button class="filter-chip" data-phase="3" onclick="togglePhase(this)">P3 1週間〜</button>
-  <button class="filter-chip" data-pack="true" id="chip-pack" onclick="togglePackFilter(this)">🎒 持ち出し</button>
+  <button class="filter-chip active" data-priority="all" onclick="togglePriorityChip(this)">すべて</button>
+  <button class="filter-chip" data-priority="required" onclick="togglePriorityChip(this)">🔴 必須のみ</button>
+  <button class="filter-chip" data-priority="required,recommend" onclick="togglePriorityChip(this)">🔴🟡 必須・推奨</button>
+  <button class="filter-chip" data-pack="true" id="chip-pack" onclick="togglePackFilter(this)">🎒 リュック</button>
 </div>
 <div id="sections-container"></div>
 ```
@@ -731,7 +710,8 @@ let quantities    = lsGet('ec3_qty',     '{}');
 let outingChecked = lsGet('ec3_outing',  '{}');
 let carChecked    = lsGet('ec3_car',     '{}');
 let preChecked    = lsGet('ec3_pre',     '{}');
-let activePhase   = 'all';
+let activePhase   = 'all'; // unused but kept for compat
+let activePriority = 'all';
 let activePackFilter = false;
 let activePreFilter  = 'all';
 let activeOutingFilter = 'all';
@@ -747,14 +727,14 @@ function isRelevant(flags) {
   if (ak.length === 0) return true;
   return flags.some(f => ak.includes(f));
 }
-function matchPhase(item) { return activePhase === 'all' || String(item.phase) === String(activePhase); }
+function matchPhase(item) { return true; }
 function matchSearch(item) {
   const q = (document.getElementById('search-input')?.value || '').trim().toLowerCase();
   return !q || item.name.toLowerCase().includes(q) || (item.sub||'').toLowerCase().includes(q);
 }
 function matchPriority(item) {
-  const f = document.getElementById('priority-filter')?.value || 'all';
-  return f === 'all' || f.split(',').includes(item.priority);
+  if (activePriority === 'all') return true;
+  return activePriority.split(',').includes(item.priority);
 }
 function matchPack(item) { return !activePackFilter || !!item.pack; }
 function badge(p) {
@@ -803,7 +783,6 @@ function renderSections() {
           ${item.location?`<div class="item-location">${item.location}</div>`:''}
         </td>
         <td>${badge(item.priority)}</td>
-        <td>${phaseBadge(item.phase)}</td>
         <td class="qty-cell"><input class="qty-input" type="text" value="${qty||item.qty||''}" onchange="saveQty('${id}',this.value)" placeholder="${item.qty||''}"></td>
       </tr>`;
     });
@@ -824,7 +803,6 @@ function renderSections() {
             <th style="width:34px">✓</th>
             <th>品目・用途・保管場所</th>
             <th style="width:90px">優先度</th>
-            <th style="width:44px">P</th>
             <th style="width:80px">数量目安</th>
           </tr></thead>
           <tbody>${rows}</tbody>
@@ -971,9 +949,11 @@ function toggleCar(id,val) { carChecked[id]=val; saveState(); renderCarList(); }
 function togglePre(id,val) { preChecked[id]=val; saveState(); renderPreaction(); }
 function toggleSection(catId) { document.getElementById('sec-'+catId)?.classList.toggle('collapsed'); }
 
-function togglePhase(btn) {
-  document.querySelectorAll('.filter-chip[data-phase]').forEach(b=>b.classList.remove('active'));
-  btn.classList.add('active'); activePhase=btn.dataset.phase; renderSections();
+function togglePriorityChip(btn) {
+  document.querySelectorAll('.filter-chip[data-priority]').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  activePriority = btn.dataset.priority;
+  renderSections();
 }
 function togglePackFilter(btn) {
   activePackFilter = !activePackFilter;
@@ -1028,7 +1008,7 @@ function exportCSV() {
   const blob=new Blob([csv],{type:'text/csv;charset=utf-8;'});
   const url=URL.createObjectURL(blob);
   const a=document.createElement('a');
-  a.href=url; a.download='非常用品チェックリスト.csv'; a.click();
+  a.href=url; a.download='防災用品チェックリスト.csv'; a.click();
   URL.revokeObjectURL(url);
 }
 
