@@ -4,7 +4,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>防災用品チェックリスト v3C</title>
+<title>防災用品チェックリスト v8</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;500;700;900&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
@@ -13,7 +13,7 @@
   --gray0:#FAFAFA; --gray1:#F2F3F4; --gray2:#D5D8DC; --gray3:#AAB7B8; --gray4:#717D7E; --gray5:#2C3E50;
   --ink:#1A252F; --white:#FFFFFF; --radius:6px; --shadow:0 2px 8px rgba(0,0,0,.10);
 }
-*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
 body{font-family:'Noto Sans JP',sans-serif;background:#F2F3F4;color:#1A252F;font-size:13px;line-height:1.6;}
 
 /* TOP BAR */
@@ -189,10 +189,10 @@ input[type=checkbox].item-check{width:15px;height:15px;cursor:pointer;accent-col
 .tips-box ul{font-size:12px;line-height:2;padding-left:18px;color:#2C3E50;}
 
 /* MOBILE SIDEBAR TOGGLE */
-#sidebar-toggle{display:none;width:100%;background:#F2F3F4;color:#1A252F;border:none;border-top:1px solid #D5D8DC;border-bottom:1px solid #D5D8DC;padding:11px 16px;font-family:‘Noto Sans JP’,sans-serif;font-size:12px;font-weight:600;cursor:pointer;text-align:left;display:flex;align-items:center;gap:8px;}
-#sidebar-toggle-label{flex:1;}
+#sidebar-toggle{display:none;width:100%;background:#2471A3;color:#FFFFFF;border:none;padding:11px 16px;font-family:‘Noto Sans JP’,sans-serif;font-size:12px;font-weight:600;cursor:pointer;text-align:left;display:flex;align-items:center;gap:8px;-webkit-tap-highlight-color:transparent;}
+#sidebar-toggle-label{flex:1;color:#FFFFFF;}
 #sidebar-toggle-badges{display:flex;gap:4px;flex-wrap:wrap;}
-#sidebar-toggle-arrow{transition:transform .2s;font-size:10px;color:#717D7E;}
+#sidebar-toggle-arrow{transition:transform .2s;font-size:10px;color:rgba(255,255,255,.8);}
 #sidebar-toggle.open #sidebar-toggle-arrow{transform:rotate(180deg);}
 
 @media (max-width:700px){
