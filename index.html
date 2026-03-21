@@ -4,7 +4,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>防災用品チェックリスト v10</title>
+<title>防災用品チェックリスト v11</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;500;700;900&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
@@ -174,7 +174,7 @@ input[type=checkbox].item-check{width:15px;height:15px;cursor:pointer;accent-col
 .preaction-item:last-child{border-bottom:none;}
 .preaction-item:hover{}
 .preaction-item.preaction-done{background:#F0FBF4;}
-.preaction-check{width:15px;height:15px;cursor:pointer;accent-color:#6C3483;margin-top:2px;flex-shrink:0;}
+.preaction-check{width:15px;height:15px;cursor:pointer;accent-color:#1E8449;margin-top:2px;flex-shrink:0;}
 .preaction-body{flex:1;}
 .preaction-name{font-size:12px;font-weight:600;}
 .preaction-name.checked-label{text-decoration:line-through;color:#AAB7B8;}
@@ -867,7 +867,7 @@ function renderWithCategories(items, wrapId, prefix, checkedMap, toggleFn, extra
       } else if (extraCol === 'target') {
         bodyHtml += `<div class="preaction-item ${chk?'preaction-done':''}">
           <input type="checkbox" class="preaction-check" ${chk?'checked':''} onchange="${toggleFn}('${id}',this.checked)">
-          <div class="preaction-body"><div class="preaction-name ${chk?'checked-label':''}">${item.name}</div><div class="preaction-sub">${item.sub||''}</div><div class="preaction-target">📌 対象：${item.target}</div></div></div>`;
+          <div class="preaction-body"><div class="preaction-name ${chk?'checked-label':''}">${item.name}</div><div class="preaction-sub">${item.sub||''}</div></div></div>`;
       } else {
         bodyHtml += `<div class="preaction-item ${chk?'preaction-done':''}">
           <input type="checkbox" class="preaction-check" ${chk?'checked':''} onchange="${toggleFn}('${id}',this.checked)">
