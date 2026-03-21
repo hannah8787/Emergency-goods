@@ -117,7 +117,11 @@ select.setting-select{width:100%;border:1.5px solid #D5D8DC;border-radius:4px;pa
 .section-header-static{display:flex;align-items:center;gap:10px;padding:11px 16px;border-bottom:1px solid #D5D8DC;background:#1A252F;white-space:nowrap;overflow:hidden;}
 .section-header-static .section-icon{font-size:16px;}
 .section-header-static .section-title{font-size:11px;font-weight:700;flex:1;color:#FFFFFF;}
-.subcategory-header{display:flex;align-items:center;gap:10px;padding:11px 16px;font-size:11px;font-weight:700;color:#FFFFFF;background:#1A252F;border-bottom:1px solid #2C3E50;letter-spacing:.04em;}
+.subcategory-header{display:flex;align-items:center;gap:10px;padding:11px 16px;font-size:11px;font-weight:700;color:#FFFFFF;background:#1A252F;border-bottom:1px solid #2C3E50;letter-spacing:.04em;cursor:pointer;user-select:none;}
+.subcategory-header:hover{background:#2C3E50;}
+.subcategory-toggle{font-size:10px;opacity:.7;transition:transform .2s;}
+.subcategory-collapsed .subcategory-toggle{transform:rotate(-90deg);}
+.subcategory-body.hidden{display:none;}
 
 /* TABLE */
 .item-table{width:100%;border-collapse:collapse;}
@@ -786,7 +790,7 @@ function renderSections() {
       <div class="section-header" onclick="toggleSection('${cat.id}')">
         <span class="section-icon">${cat.icon}</span>
         <span class="section-title">${cat.title}</span>
-        <span class="section-stats">${catC}/${catT} (${pct}%)</span>
+        <span class="section-stats">${catC}/${catT}</span>
         <span class="section-toggle">▼</span>
       </div>
       <div class="section-body">
@@ -816,52 +820,78 @@ function renderSections() {
 // ═══════════════════════════════════════════════════
 function renderWithCategories(items, wrapId, prefix, checkedMap, toggleFn, extraCol, searchInputId) {
   const wrap = document.getElementById(wrapId);
-  if (!wrap) return;
+  if (!wrap) return 0;
+  const collapsed = wrap._collapsed || {};
+  wrap.innerHTML = '';
+  wrap._collapsed = collapsed;
   const q = searchInputId ? (document.getElementById(searchInputId)?.value || '').trim().toLowerCase() : '';
-  let done = 0, html = '', lastCat = null;
+
+  // カテゴリごとに分類
+  const cats = [];
+  const catMap = {};
   items.forEach((item, i) => {
     const id = prefix + '_' + i;
     const chk = !!checkedMap[id];
-    if (chk) done++;
-    // 検索フィルター
-    const matchQ = !q || (item.name||'').toLowerCase().includes(q) || (item.detail||'').toLowerCase().includes(q) || (item.sub||'').toLowerCase().includes(q);
-    if (!matchQ) return;
-    if (item.cat && item.cat !== lastCat) {
-      html += `<div class="subcategory-header">${item.cat}</div>`;
-      lastCat = item.cat;
-    }
-    if (extraCol === 'weight') {
-      html += `<div class="preaction-item ${chk ? 'preaction-done' : ''}">
-        <input type="checkbox" class="preaction-check" ${chk ? 'checked' : ''} onchange="${toggleFn}('${id}',this.checked)">
-        <div class="preaction-body" style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px;">
-          <div style="flex:1;">
-            <div class="preaction-name ${chk ? 'checked-label' : ''}">${item.name}</div>
-            <div class="preaction-sub">${item.detail || ''}</div>
-          </div>
-          <div style="font-size:10px;color:#717D7E;font-family:'DM Mono',monospace;white-space:nowrap;flex-shrink:0;">${item.weight || ''}</div>
-        </div>
-      </div>`;
-    } else if (extraCol === 'target') {
-      html += `<div class="preaction-item ${chk ? 'preaction-done' : ''}">
-        <input type="checkbox" class="preaction-check" ${chk ? 'checked' : ''} onchange="${toggleFn}('${id}',this.checked)">
-        <div class="preaction-body">
-          <div class="preaction-name ${chk ? 'checked-label' : ''}">${item.name}</div>
-          <div class="preaction-sub">${item.sub || ''}</div>
-          <div class="preaction-target">📌 対象：${item.target}</div>
-        </div>
-      </div>`;
-    } else {
-      html += `<div class="preaction-item ${chk ? 'preaction-done' : ''}">
-        <input type="checkbox" class="preaction-check" ${chk ? 'checked' : ''} onchange="${toggleFn}('${id}',this.checked)">
-        <div class="preaction-body">
-          <div class="preaction-name ${chk ? 'checked-label' : ''}">${item.name}</div>
-          <div class="preaction-sub">${item.detail || ''}</div>
-        </div>
-      </div>`;
-    }
+    const cat = item.cat || '';
+    if (!catMap[cat]) { catMap[cat] = {name:cat, items:[], done:0}; cats.push(catMap[cat]); }
+    catMap[cat].items.push({item, i, id, chk});
+    if (chk) catMap[cat].done++;
   });
-  wrap.innerHTML = html;
+
+  let done = 0;
+  cats.forEach(cat => {
+    done += cat.done;
+    const filtered = cat.items.filter(({item}) =>
+      !q || (item.name||'').toLowerCase().includes(q) ||
+      (item.detail||'').toLowerCase().includes(q) ||
+      (item.sub||'').toLowerCase().includes(q)
+    );
+    if (!filtered.length) return;
+
+    const catId = `${wrapId}_cat_${cats.indexOf(cat)}`;
+    const collapsed = wrap._collapsed && wrap._collapsed[catId];
+    let bodyHtml = '';
+    filtered.forEach(({item, id, chk}) => {
+      if (extraCol === 'weight') {
+        bodyHtml += `<div class="preaction-item ${chk?'preaction-done':''}">
+          <input type="checkbox" class="preaction-check" ${chk?'checked':''} onchange="${toggleFn}('${id}',this.checked)">
+          <div class="preaction-body" style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px;">
+            <div style="flex:1;"><div class="preaction-name ${chk?'checked-label':''}">${item.name}</div><div class="preaction-sub">${item.detail||''}</div></div>
+            <div style="font-size:10px;color:#717D7E;font-family:'DM Mono',monospace;white-space:nowrap;flex-shrink:0;">${item.weight||''}</div>
+          </div></div>`;
+      } else if (extraCol === 'target') {
+        bodyHtml += `<div class="preaction-item ${chk?'preaction-done':''}">
+          <input type="checkbox" class="preaction-check" ${chk?'checked':''} onchange="${toggleFn}('${id}',this.checked)">
+          <div class="preaction-body"><div class="preaction-name ${chk?'checked-label':''}">${item.name}</div><div class="preaction-sub">${item.sub||''}</div><div class="preaction-target">📌 対象：${item.target}</div></div></div>`;
+      } else {
+        bodyHtml += `<div class="preaction-item ${chk?'preaction-done':''}">
+          <input type="checkbox" class="preaction-check" ${chk?'checked':''} onchange="${toggleFn}('${id}',this.checked)">
+          <div class="preaction-body"><div class="preaction-name ${chk?'checked-label':''}">${item.name}</div><div class="preaction-sub">${item.detail||''}</div></div></div>`;
+      }
+    });
+
+    const headerHtml = `<div class="subcategory-header ${collapsed?'subcategory-collapsed':''}" onclick="toggleSubcat('${wrapId}','${catId}')">
+      <span class="section-icon" style="flex-shrink:0;">${cat.name.match(/^\p{Emoji}/u)?.[0]||''}</span>
+      <span style="flex:1;">${cat.name.replace(/^\p{Emoji}/u,'').trim()}</span>
+      <span style="font-family:'DM Mono',monospace;font-size:10px;opacity:.7;margin-right:8px;">${cat.done}/${cat.items.length}</span>
+      <span class="subcategory-toggle">▼</span>
+    </div>
+    <div class="subcategory-body ${collapsed?'hidden':''}" id="${catId}">${bodyHtml}</div>`;
+    wrap.insertAdjacentHTML('beforeend', headerHtml);
+  });
+
   return done;
+}
+
+function toggleSubcat(wrapId, catId) {
+  const wrap = document.getElementById(wrapId);
+  if (!wrap) return;
+  wrap._collapsed = wrap._collapsed || {};
+  wrap._collapsed[catId] = !wrap._collapsed[catId];
+  const body = document.getElementById(catId);
+  const header = body?.previousElementSibling;
+  if (body) body.classList.toggle('hidden', !!wrap._collapsed[catId]);
+  if (header) header.classList.toggle('subcategory-collapsed', !!wrap._collapsed[catId]);
 }
 
 function renderPreaction() {
