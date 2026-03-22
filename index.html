@@ -4,7 +4,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>防災用品チェックリスト v23</title>
+<title>防災用品チェックリスト v24</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;500;700;900&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
@@ -999,11 +999,11 @@ function resetAll() {
 }
 
 function exportCSV() {
-  let csv='\uFEFF品目名,カテゴリ,優先度,フェーズ,数量目安,入手済み,リュック\n';
+  let csv='\uFEFF品目名,カテゴリ,優先度,数量目安,入手済み,リュック\n';
   CATEGORIES.forEach(cat=>{
     cat.items.forEach(item=>{
       const id=cat.id+'_'+item.name;
-      const row=[item.name,cat.title,item.priority==='required'?'必須':item.priority==='recommend'?'推奨':'あると安心','P'+item.phase,item.qty,checkedItems[id]?'✓':'',item.pack?'🎒':''];
+      const row=[item.name,cat.title,item.priority==='required'?'必須':item.priority==='recommend'?'推奨':'安心',item.qty,checkedItems[id]?'✓':'',item.pack?'🎒':''];
       csv+=row.map(v=>`"${String(v).replace(/"/g,'""')}"`).join(',')+'\n';
     });
   });
