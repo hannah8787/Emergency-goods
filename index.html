@@ -4,7 +4,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>防災用品チェックリスト</title>
+<title>防災用品チェックリスト v23</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;500;700;900&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
@@ -180,10 +180,10 @@ input[type=checkbox].item-check{width:15px;height:15px;cursor:pointer;accent-col
 #sidebar-toggle-arrow{transition:transform .2s;font-size:10px;color:rgba(255,255,255,.8);}
 #sidebar-toggle.open #sidebar-toggle-arrow{transform:rotate(180deg);}
 
-@media (max-width:900px){
+@media (max-width:600px){
 #app{flex-direction:column;min-height:unset;}
 #sidebar-toggle{display:flex;align-items:center;gap:8px;order:1;}
-#sidebar{width:100%;min-width:unset;height:auto;position:static;border-right:none;overflow:hidden;max-height:0;opacity:0;transition:max-height .4s cubic-bezier(0,0,.2,1), opacity .3s ease;order:2;padding:0;pointer-events:none;}
+#sidebar{width:100%;min-width:unset;max-width:unset;height:auto;position:static;border-right:none;overflow:hidden;max-height:0;opacity:0;transition:max-height .4s cubic-bezier(0,0,.2,1), opacity .3s ease;order:2;padding:0;pointer-events:none;}
 #sidebar.open{max-height:2000px;opacity:1;border-bottom:1px solid #D5D8DC;pointer-events:auto;transition:max-height .4s cubic-bezier(.4,0,1,1), opacity .3s ease;}
 #sidebar-inner{padding:12px 14px 16px;}
 #main{padding:12px 10px;order:3;}
@@ -223,17 +223,15 @@ body{background:white;font-size:11px;}
     <label class="row-label">家族構成</label>
     <div class="toggle-group">
       <button class="toggle-btn" data-key="baby" onclick="toggleSetting(this)">乳幼児あり</button>
-      <button class="toggle-btn" data-key="kids" onclick="toggleSetting(this)">小学生以上の子</button>
-      <button class="toggle-btn" data-key="elder" onclick="toggleSetting(this)">高齢者同居</button>
+      <button class="toggle-btn" data-key="pregnant" onclick="toggleSetting(this)">妊婦・授乳中あり</button>
+      <button class="toggle-btn" data-key="elder" onclick="toggleSetting(this)">高齢者あり</button>
       <button class="toggle-btn" data-key="pet" onclick="toggleSetting(this)">ペットあり</button>
-      <button class="toggle-btn" data-key="pregnant" onclick="toggleSetting(this)">妊婦・授乳中</button>
     </div>
   </div>
   <div class="setting-row">
     <label class="row-label">住居タイプ</label>
     <div class="toggle-group">
-      <button class="toggle-btn" data-key="mansion_high" onclick="toggleSetting(this)">マンション高層（4F以上）</button>
-      <button class="toggle-btn" data-key="mansion_low" onclick="toggleSetting(this)">マンション低層（1〜3F）</button>
+      <button class="toggle-btn" data-key="mansion" onclick="toggleSetting(this)">マンション</button>
       <button class="toggle-btn" data-key="house" onclick="toggleSetting(this)">戸建て</button>
     </div>
   </div>
@@ -523,7 +521,7 @@ const CATEGORIES = [
       {name:"車用緊急脱出ハンマー（シートカッター付き）", sub:"車ごと水没・衝突時の窓ガラス破壊・シートベルト切断。運転席から手が届く位置に固定", location:"📍運転席付近", priority:"required", phase:1, flags:["car"], qty:"1個"},
       {name:"ライフジャケット（浮力体）", sub:"水害時の水没・流水からの保護。津波・洪水リスクのある地域では必携。<br>🎒全量", location:"📍玄関・収納スペース", priority:"required", phase:1, flags:["coast"], qty:"人数分", pack:true},
       {name:"防水袋（ドライバッグ）", sub:"重要書類・電子機器・食料の防水保護。水害時の避難時だけでなく、雨天時の外出・保管にも有用。<br>🎒全量", location:"📍収納スペース・避難リュック", priority:"recommend", phase:1, flags:"all", qty:"2〜3個", pack:true},
-      {name:"土のう袋", sub:"自宅への浸水を防ぐ応急的な水止め。低地・浸水リスクエリアの基本対策", location:"📍玄関・収納スペース", priority:"required", phase:1, flags:["coast","mansion_low"], qty:"20袋以上"},
+      {name:"土のう袋", sub:"自宅への浸水を防ぐ応急的な水止め。低地・浸水リスクエリアの基本対策", location:"📍玄関・収納スペース", priority:"required", phase:1, flags:["coast"], qty:"20袋以上"},
       {name:"登山用ストック・杖", sub:"瓦礫の多い道での歩行補助・高齢者の移動補助", location:"📍収納スペース", priority:"recommend", phase:2, flags:["elder","mountain"], qty:"人数分"},
     ]
   },
@@ -559,8 +557,8 @@ const CATEGORIES = [
   {
     id:"mental", icon:"😊", title:"精神的健康・コミュニケーション",
     items:[
-      {name:"子ども向けおもちゃ・絵本（お気に入りのもの）", sub:"子どもの不安・ストレスを和らげる。見知らぬ環境での情緒安定に効果的。お気に入りのものが最も効果的。<br>🎒全量", location:"📍避難リュック", priority:"required", phase:1, flags:["baby","kids"], qty:"数点", pack:true},
-      {name:"ぬいぐるみ・安心グッズ", sub:"子どもの愛着対象が精神的安定に非常に有効。避難リュックに1点は必ず入れる。<br>🎒全量", location:"📍枕元・避難リュック", priority:"required", phase:1, flags:["baby","kids"], qty:"1点", pack:true},
+      {name:"子ども向けおもちゃ・絵本（お気に入りのもの）", sub:"子どもの不安・ストレスを和らげる。見知らぬ環境での情緒安定に効果的。お気に入りのものが最も効果的。<br>🎒全量", location:"📍避難リュック", priority:"required", phase:1, flags:["baby"], qty:"数点", pack:true},
+      {name:"ぬいぐるみ・安心グッズ", sub:"子どもの愛着対象が精神的安定に非常に有効。避難リュックに1点は必ず入れる。<br>🎒全量", location:"📍枕元・避難リュック", priority:"required", phase:1, flags:["baby"], qty:"1点", pack:true},
       {name:"ボードゲーム・トランプ・カード", sub:"避難所での長時間の暇つぶし・コミュニティ形成。人との交流が精神的回復を助ける", location:"📍収納スペース", priority:"recommend", phase:2, flags:"all", qty:"1〜2点"},
       {name:"お気に入りのお菓子・飲み物", sub:"精神的安定剤。日常の味・香りが強いストレス環境での心の支えになる。<br>🎒全量", location:"📍収納スペース・避難リュック", priority:"recommend", phase:1, flags:"all", qty:"適量", pack:true},
       {name:"ノート・鉛筆・ペン", sub:"情報記録・伝言メモ・子どもの遊び・精神的整理。防水袋に入れて保管。<br>🎒全量", location:"📍避難リュック", priority:"recommend", phase:1, flags:"all", qty:"2セット", pack:true},
@@ -695,7 +693,7 @@ function isRelevant(flags) {
   // フラグをカテゴリ別に定義
   const flagGroups = {
     family: ['baby','kids','elder','pet','pregnant'],
-    dwelling: ['mansion_high','mansion_low','house'],
+    dwelling: ['mansion','house'],
     location: ['coast','mountain'],
     car: ['car'],
   };
@@ -922,7 +920,7 @@ function toggleSetting(btn) {
   settings[k]=!settings[k];
   btn.classList.toggle('active',settings[k]);
   // 住居タイプは排他（1つだけ選べる）
-  const mutex={mansion_high:['mansion_low','house'],mansion_low:['mansion_high','house'],house:['mansion_high','mansion_low']};
+  const mutex={mansion:['house'],house:['mansion']};
   const allMutex = {...mutex};
   if(settings[k] && allMutex[k]) allMutex[k].forEach(ok=>{
     settings[ok]=false;
